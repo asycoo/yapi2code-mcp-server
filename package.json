@@ -1,0 +1,29 @@
+{
+	"name": "yapi2code-mcp-server",
+	"version": "0.1.0",
+	"description": "MCP server: fetch YApi interface detail and generate request code (yapi2code generateCode)",
+	"type": "module",
+	"main": "dist/server.js",
+	"bin": {
+		"yapi2code-mcp-server": "./dist/server.js"
+	},
+	"scripts": {
+		"build": "tsc",
+		"start": "node dist/server.js",
+		"dev": "node --watch --import tsx src/server.ts"
+	},
+	"engines": {
+		"node": ">=18.0.0"
+	},
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "^1.9.0",
+		"axios": "^1.8.4",
+		"zod": "^3.24.2"
+	},
+	"devDependencies": {
+		"@types/node": "^22.14.0",
+		"tsx": "^4.19.3",
+		"typescript": "^5.8.2"
+	},
+	"license": "MIT"
+}

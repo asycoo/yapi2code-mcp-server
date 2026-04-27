@@ -187,7 +187,7 @@ export function generateCode(detail: InterfaceDetail, importStatement: string): 
 	const FnName = fnName.charAt(0).toUpperCase() + fnName.slice(1);
 
 	let paramsDef = '';
-	let paramsUsage = '';
+	let optionsLines: string[] = [];
 	// 默认返回“完整响应体”类型；同时额外导出 ResData 方便拿 data 字段
 	const returnType = resBodyType
 		? `I${FnName}ResBody`
@@ -195,25 +195,24 @@ export function generateCode(detail: InterfaceDetail, importStatement: string): 
 			? `I${FnName}ResData`
 			: 'any';
 
-	if (method === 'get' && reqQueryType) {
-		paramsDef = `params: I${FnName}ReqQuery`;
-		paramsUsage = ', { params }';
-	} else if (reqBodyType) {
+	const methodUpper = detail.method.toUpperCase();
+	optionsLines.push(`    method: "${methodUpper}",`);
+
+	// 优先 body，其次 query
+	if (reqBodyType) {
 		paramsDef = `data: I${FnName}ReqBody`;
-		paramsUsage = ', data';
+		optionsLines.push(`    data,`);
 	} else if (reqQueryType) {
-		paramsDef = `params: I${FnName}ReqQuery`;
-		paramsUsage = method === 'get' ? ', { params }' : ', params';
+		// 参考目标格式：GET 的 params 入参允许不传
+		paramsDef = `params?: I${FnName}ReqQuery`;
+		optionsLines.push(`    params,`);
 	}
 
 	const requestFn = [
-		`/**`,
-		` * ${detail.title}`,
-		` * @method ${detail.method}`,
-		` * @path ${detail.path}`,
-		` */`,
 		`export async function ${fnName}(${paramsDef}): Promise<${returnType}> {`,
-		`  return request.${method}('${detail.path}'${paramsUsage});`,
+		`  return request("${detail.path}", {`,
+		...optionsLines,
+		`  });`,
 		`}`,
 	].join('\n');
 
